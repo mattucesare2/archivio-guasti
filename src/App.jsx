@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Client, Databases, Storage, ID, Query } from 'appwrite';
 
-// Configurazione Appwrite (inserisci qui i tuoi dati)
 const APPWRITE_ENDPOINT = 'https://cloud.appwrite.io/v1';
-const PROJECT_ID = ''; // Inserisci il tuo Project ID di Appwrite
+const PROJECT_ID = ''; // Inserisci qui il tuo Project ID di Appwrite
 const DATABASE_ID = 'archivio_db';
 const CATEGORIES_COLLECTION_ID = 'categories';
 const ISSUES_COLLECTION_ID = 'issues';
@@ -40,7 +39,6 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [currentIssue, setCurrentIssue] = useState(null);
 
-  // Form stato
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(DEFAULT_CATEGORIES[0].name);
   const [status, setStatus] = useState('In Corso');
@@ -52,7 +50,6 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
 
-  // Nuova categoria form
   const [newCatName, setNewCatName] = useState('');
   const [newCatColor, setNewCatColor] = useState('#2563eb');
 
@@ -62,7 +59,6 @@ export default function App() {
 
   const fetchData = async () => {
     if (!PROJECT_ID) {
-      // Modalità locale se non è impostato il Project ID
       const localIssues = localStorage.getItem('local_issues');
       const localCats = localStorage.getItem('local_cats');
       if (localIssues) setIssues(JSON.parse(localIssues));
@@ -108,7 +104,6 @@ export default function App() {
     };
 
     if (!PROJECT_ID) {
-      // LocalStorage fallback
       const newItems = currentIssue 
         ? issues.map(i => i.id === currentIssue.id ? { ...issueData, id: currentIssue.id } : i)
         : [{ ...issueData, id: Date.now().toString() }, ...issues];
@@ -222,7 +217,6 @@ export default function App() {
             className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500"
           />
           <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
-            <h>Tutte le Categorie</h>
             <option value="ALL">Tutte le Categorie</option>
             {categories.map(c => <option key={c.id || c.name} value={c.name}>{c.name}</option>)}
           </select>
@@ -463,4 +457,18 @@ export default function App() {
                 <ol className="list-decimal list-inside space-y-2 text-slate-200">
                   <li>Crea un progetto su <a href="https://cloud.appwrite.io" target="_blank" rel="noreferrer" className="text-blue-400 underline">cloud.appwrite.io</a>.</li>
                   <li>Crea un database denominato <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300">archivio_db</code>.</li>
-                  <li>Crea la tabella <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300">categories
+                  <li>Crea la tabella <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300">categories</code> con colonne: <code className="text-xs text-amber-300">name</code> (Text), <code className="text-xs text-amber-300">color</code> (Text).</li>
+                  <li>Crea la tabella <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300">issues</code> con colonne: <code className="text-xs text-amber-300">title</code>, <code className="text-xs text-amber-300">category</code>, <code className="text-xs text-amber-300">status</code>, <code className="text-xs text-amber-300">priority</code>, <code className="text-xs text-amber-300">plant</code>, <code className="text-xs text-amber-300">rootCause</code>, <code className="text-xs text-amber-300">solution</code>, <code className="text-xs text-amber-300">tags</code>, <code className="text-xs text-amber-300">fileUrl</code> (tutte Text).</li>
+                  <li>In entrambe le tabelle, vai nel tab <strong>Security</strong>, aggiungi il ruolo <strong>Any</strong> e spunta <strong>Create, Read, Update, Delete</strong>.</li>
+                  <li>Crea un bucket di Storage chiamato <code className="bg-slate-900 px-2 py-0.5 rounded text-blue-300">attachments</code> (con permessi <strong>Any</strong> in lettura/scrittura).</li>
+                  <li>Copia il tuo <strong>Project ID</strong> dalle impostazioni del progetto Appwrite e incollalo nella costante <code className="text-blue-300">PROJECT_ID</code> all'inizio del codice in <code className="text-amber-300">App.jsx</code>.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
