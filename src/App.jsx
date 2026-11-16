@@ -39,6 +39,10 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [currentIssue, setCurrentIssue] = useState(null);
 
+  // PWA Install Prompt State
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
+
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(DEFAULT_CATEGORIES[0].name);
   const [status, setStatus] = useState('In Corso');
@@ -55,7 +59,24 @@ export default function App() {
 
   useEffect(() => {
     fetchData();
+
+    // Cattura l'evento di installabilità di Chrome
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    });
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setShowInstallBtn(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   const fetchData = async () => {
     if (!PROJECT_ID) {
@@ -195,11 +216,16 @@ export default function App() {
             <p className="text-slate-400 text-sm mt-1">Gestione tecnica e troubleshooting industriale on-site e da remoto</p>
           </div>
           <div className="flex flex-wrap gap-3 w-full md:w-auto">
+            {showInstallBtn && (
+              <button onClick={handleInstallClick} className="bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 animate-pulse">
+                📲 Installa App
+              </button>
+            )}
             <button onClick={() => setIsCatModalOpen(true)} className="flex-1 md:flex-none bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
-              🏷️ Gestisci Categorie
+              🏷️ Categorie
             </button>
             <button onClick={() => setIsGuideOpen(true)} className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
-              📖 Guida Appwrite
+              📖 Guida
             </button>
             <button onClick={() => openModal()} className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 px-5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30">
               ➕ Nuovo Guasto
